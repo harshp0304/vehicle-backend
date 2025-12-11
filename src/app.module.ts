@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BikeMasterModule } from './masters/bike-master/bike-master/bike-master.module';
@@ -7,6 +8,9 @@ import { MaintenanceModule } from './masters/maintenance/maintenance/maintenance
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     DatabaseModule,
     // Core modules
     BikeMasterModule,

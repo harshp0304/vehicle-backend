@@ -53,7 +53,7 @@ const DB_CONFIG: Environment = {
   JWTKEY: '',
   TOKEN_EXPIRATION: '1w',
   SECRET_KEY: '',
-  PORT: 3000,
+  PORT: 4000,
   DATABASE_CONFIG: {
     username: 'postgres',
     password: 'postgres', // Change this to your PostgreSQL password

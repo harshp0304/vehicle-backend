@@ -33,7 +33,7 @@ class CreateInsuranceDetailDto {
   Coverage_Amount?: number;
 }
 
-class CreateMaintenanceDetailDto {
+class CreateMaintenanceDetailNestedDto {
   @ApiProperty()
   @IsString()
   Service_Date: string;
@@ -116,12 +116,12 @@ export class CreateBikeMasterDto {
   @IsOptional()
   InsuranceDetails?: CreateInsuranceDetailDto[];
 
-  @ApiProperty({ type: [CreateMaintenanceDetailDto], required: false })
+  @ApiProperty({ type: [CreateMaintenanceDetailNestedDto], required: false })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateMaintenanceDetailDto)
+  @Type(() => CreateMaintenanceDetailNestedDto)
   @IsOptional()
-  MaintenanceDetails?: CreateMaintenanceDetailDto[];
+  MaintenanceDetails?: CreateMaintenanceDetailNestedDto[];
 }
 
 export class UpdateBikeMasterDto extends CreateBikeMasterDto {}

@@ -14,7 +14,7 @@ interface DatabaseConfig {
   username: string;
   password: string;
   database: string;
-  logging: boolean;
+  logging: boolean | ((sql: string, timing?: number) => void);
   define: {
     timestamps: boolean;
     underscored: boolean;
@@ -51,7 +51,10 @@ export const databaseProviders = [
           username: configService.get<string>('DB_USERNAME', 'postgres'),
           password: configService.get<string>('DB_PASSWORD', 'postgres'),
           database: configService.get<string>('DB_NAME', 'bike_management'),
-          logging: configService.get<string>('NODE_ENV') === 'development',
+          logging:
+            configService.get<string>('NODE_ENV') === 'development'
+              ? console.log
+              : false,
           define: {
             timestamps: true,
             underscored: true,
