@@ -15,7 +15,18 @@ interface IDatabaseConfigAttributes {
   dialect?: string;
   urlDatabase?: string;
   logging?: boolean;
-  dialectOptions?: any;
+  dialectOptions?: {
+    ssl?: {
+      require: boolean;
+      rejectUnauthorized: boolean;
+    } | boolean;
+  };
+  pool?: {
+    max: number;
+    min: number;
+    acquire: number;
+    idle: number;
+  };
 }
 
 interface Environment {
@@ -44,13 +55,28 @@ const DB_CONFIG: Environment = {
   SECRET_KEY: '',
   PORT: 3000,
   DATABASE_CONFIG: {
-    username: 'rs_development',
-    password: 'P8L5fE123456_',
-    database: 'Kvn_Practice',
-    host: '192.168.27.3',
-    port: 1433,
-    dialect: 'mssql',
+    username: 'postgres',
+    password: 'postgres', // Change this to your PostgreSQL password
+    database: 'bike_management',
+    host: 'localhost',
+    port: 5432,
+    dialect: 'postgres',
     logging: false,
+    dialectOptions: {
+      ssl:
+        process.env.NODE_ENV === 'production'
+          ? {
+              require: true,
+              rejectUnauthorized: false,
+            }
+          : false,
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
   },
   EMAIL_USER: 'harshhp687@gmail.com',
   // EMAIL_PASS: 'Accur8@2017',

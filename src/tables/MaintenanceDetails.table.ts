@@ -29,10 +29,10 @@ export class MaintenanceTable extends Model<Int_Master_MaintenanceDetails> {
   @Column({ type: DataType.STRING, field: 'Service_Type' })
   Service_Type: string;
 
-  @Column({ type: DataType.NUMBER, field: 'Service_Cost' })
+  @Column({ type: DataType.INTEGER, field: 'Service_Cost' })
   Service_Cost: number;
 
-  @Column({ type: DataType.NUMBER, field: 'Mileage' })
+  @Column({ type: DataType.INTEGER, field: 'Mileage' })
   Mileage: number;
 
   @Column({ type: DataType.STRING, field: 'Service_Center' })

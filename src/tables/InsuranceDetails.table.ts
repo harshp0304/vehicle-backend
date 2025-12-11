@@ -46,9 +46,9 @@ export class InsuranceTable extends Model<
   @Column({ type: DataType.DATE, field: 'Valid_Until' })
   Valid_Until: Date;
 
-  @Column({ type: DataType.NUMBER, field: 'Premium' })
+  @Column({ type: DataType.INTEGER, field: 'Premium' })
   Premium: number;
 
-  @Column({ type: DataType.NUMBER, field: 'Coverage_Amount' })
+  @Column({ type: DataType.INTEGER, field: 'Coverage_Amount' })
   Coverage_Amount: number;
 }

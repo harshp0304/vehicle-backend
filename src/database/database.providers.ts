@@ -6,6 +6,7 @@ import { BikeDetailsTable } from 'src/tables/BikeDetails.table';
 import { masterAssociation } from './assciations/masterassociation';
 import { InsuranceTable } from 'src/tables/InsuranceDetails.table';
 import { MaintenanceTable } from 'src/tables/MaintenanceDetails.table';
+import * as pg from 'pg';
 
 interface DatabaseConfig {
   host: string;
@@ -17,6 +18,13 @@ interface DatabaseConfig {
   define: {
     timestamps: boolean;
     underscored: boolean;
+  };
+  dialectModule: typeof import('pg');
+  dialectOptions: {
+    ssl: boolean | {
+      require: boolean;
+      rejectUnauthorized: boolean;
+    };
   };
   pool: {
     max: number;
@@ -38,15 +46,26 @@ export const databaseProviders = [
 
       try {
         const dbConfig: DatabaseConfig = {
-          host: configService.get<string>('DB_HOST', '192.168.27.3'),
-          port: configService.get<number>('DB_PORT', 1433),
-          username: configService.get<string>('DB_USERNAME', 'rs_development'),
-          password: configService.get<string>('DB_PASSWORD', 'P8L5fE123456_'),
-          database: configService.get<string>('DB_NAME', 'Kvn_Practice'),
+          host: configService.get<string>('DB_HOST', 'localhost'),
+          port: configService.get<number>('DB_PORT', 5432),
+          username: configService.get<string>('DB_USERNAME', 'postgres'),
+          password: configService.get<string>('DB_PASSWORD', 'postgres'),
+          database: configService.get<string>('DB_NAME', 'bike_management'),
           logging: configService.get<string>('NODE_ENV') === 'development',
           define: {
             timestamps: true,
             underscored: true,
+          },
+          dialectModule: pg as unknown as typeof import('pg'),
+          dialectOptions: {
+            ssl:
+              configService.get<string>('DB_SSL') === 'true' ||
+              configService.get<string>('NODE_ENV') === 'production'
+                ? {
+                    require: true,
+                    rejectUnauthorized: false,
+                  }
+                : false,
           },
           pool: {
             max: 5,
@@ -65,7 +84,7 @@ export const databaseProviders = [
         );
 
         const sequelize = new Sequelize({
-          dialect: 'mssql',
+          dialect: 'postgres',
           ...dbConfig,
         });
 
@@ -97,8 +116,8 @@ export const databaseProviders = [
         // Provide more helpful error message
         if (errorMessage.includes('ECONNREFUSED')) {
           throw new Error(
-            'Failed to connect to MySQL server. ' +
-              'Please make sure MySQL is running and the connection details in your .env file are correct.\n' +
+            'Failed to connect to PostgreSQL server. ' +
+              'Please make sure PostgreSQL is running and the connection details in your .env file are correct.\n' +
               'Error: ' +
               errorMessage,
           );
