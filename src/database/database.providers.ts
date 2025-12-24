@@ -6,6 +6,7 @@ import { BikeDetailsTable } from 'src/tables/BikeDetails.table';
 import { masterAssociation } from './assciations/masterassociation';
 import { InsuranceTable } from 'src/tables/InsuranceDetails.table';
 import { MaintenanceTable } from 'src/tables/MaintenanceDetails.table';
+import { UserMasterTable } from 'src/tables/User.table';
 import * as pg from 'pg';
 
 interface DatabaseConfig {
@@ -21,10 +22,12 @@ interface DatabaseConfig {
   };
   dialectModule: typeof import('pg');
   dialectOptions: {
-    ssl: boolean | {
-      require: boolean;
-      rejectUnauthorized: boolean;
-    };
+    ssl:
+      | boolean
+      | {
+          require: boolean;
+          rejectUnauthorized: boolean;
+        };
   };
   pool: {
     max: number;
@@ -45,57 +48,82 @@ export const databaseProviders = [
       const logger = new Logger('DatabaseProvider');
 
       try {
-        const dbConfig: DatabaseConfig = {
-          host: configService.get<string>('DB_HOST', 'localhost'),
-          port: configService.get<number>('DB_PORT', 5432),
-          username: configService.get<string>('DB_USERNAME', 'postgres'),
-          password: configService.get<string>('DB_PASSWORD', 'postgres'),
-          database: configService.get<string>('DB_NAME', 'bike_management'),
-          logging:
-            configService.get<string>('NODE_ENV') === 'development'
-              ? console.log
-              : false,
-          define: {
-            timestamps: true,
-            underscored: true,
-          },
-          dialectModule: pg as unknown as typeof import('pg'),
-          dialectOptions: {
-            ssl:
-              configService.get<string>('DB_SSL') === 'true' ||
-              configService.get<string>('NODE_ENV') === 'production'
-                ? {
-                    require: true,
-                    rejectUnauthorized: false,
-                  }
+        const databaseUrl = configService.get<string>('DATABASE_URL');
+        let sequelize: Sequelize;
+
+        if (databaseUrl) {
+          logger.log('Connecting to database via DATABASE_URL');
+          sequelize = new Sequelize(databaseUrl, {
+            dialect: 'postgres',
+            logging:
+              configService.get<string>('NODE_ENV') === 'development'
+                ? console.log
                 : false,
-          },
-          pool: {
-            max: 5,
-            min: 0,
-            acquire: 30000,
-            idle: 10000,
-          },
-          retry: {
-            max: 3,
-            timeout: 30000, // 30 seconds
-          },
-        };
+            dialectOptions: {
+              ssl: {
+                require: true,
+                rejectUnauthorized: false,
+              },
+            },
+            define: {
+              timestamps: true,
+              underscored: true,
+            },
+          });
+        } else {
+          const dbConfig: DatabaseConfig = {
+            host: configService.get<string>('DB_HOST', 'localhost'),
+            port: configService.get<number>('DB_PORT', 5432),
+            username: configService.get<string>('DB_USERNAME', 'postgres'),
+            password: configService.get<string>('DB_PASSWORD', 'postgres'),
+            database: configService.get<string>('DB_NAME', 'bike_management'),
+            logging:
+              configService.get<string>('NODE_ENV') === 'development'
+                ? console.log
+                : false,
+            define: {
+              timestamps: true,
+              underscored: true,
+            },
+            dialectModule: pg as unknown as typeof import('pg'),
+            dialectOptions: {
+              ssl:
+                configService.get<string>('DB_SSL') === 'true' ||
+                configService.get<string>('NODE_ENV') === 'production'
+                  ? {
+                      require: true,
+                      rejectUnauthorized: false,
+                    }
+                  : false,
+            },
+            pool: {
+              max: 5,
+              min: 0,
+              acquire: 30000,
+              idle: 10000,
+            },
+            retry: {
+              max: 3,
+              timeout: 30000, // 30 seconds
+            },
+          };
 
-        logger.log(
-          `Connecting to database: ${dbConfig.database}@${dbConfig.host}:${dbConfig.port}`,
-        );
+          logger.log(
+            `Connecting to database: ${dbConfig.database}@${dbConfig.host}:${dbConfig.port}`,
+          );
 
-        const sequelize = new Sequelize({
-          dialect: 'postgres',
-          ...dbConfig,
-        });
+          sequelize = new Sequelize({
+            dialect: 'postgres',
+            ...dbConfig,
+          });
+        }
 
         sequelize.addModels([
           BikeMasterTable,
           BikeDetailsTable,
           InsuranceTable,
           MaintenanceTable,
+          UserMasterTable,
         ]);
 
         // Test the connection
@@ -107,7 +135,7 @@ export const databaseProviders = [
         logger.log('Model associations initialized');
 
         // Sync all models
-        await sequelize.sync({ alter: false });
+        await sequelize.sync({ alter: false, force: false });
         logger.log('Database synchronized');
 
         return sequelize;
@@ -154,5 +182,9 @@ export const modelProviders = [
   {
     provide: 'MAINTENANCE_DETAILS_MODEL',
     useValue: MaintenanceTable,
+  },
+  {
+    provide: 'USER_REPOSITORY',
+    useValue: UserMasterTable,
   },
 ];

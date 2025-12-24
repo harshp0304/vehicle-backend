@@ -4,6 +4,7 @@ export const TABLE_NAMES = {
   BIKE_DETAILS: 'BikeDetails',
   INSURANCE_DETAILS: 'Insurance',
   MAINTENANCE_DETAILS: 'Maintenance',
+  USER_MASTER: 'UserMaster',
 };
 
 export const TABLE_INDEX = {

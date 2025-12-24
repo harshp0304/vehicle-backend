@@ -21,6 +21,12 @@ export interface Int_Master_BikeDetails {
   InsuranceEndDate: Date;
 }
 
+export interface Int_Master_User {
+  UMID: number;
+  MobileNo: string;
+  Password: string;
+}
+
 export interface Int_Master_InsuranceDetails {
   INSID: number;
   BikeID: number;

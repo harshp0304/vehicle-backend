@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import * as environment from './environment/environment';
 import { DB_CONFIG } from './environment/environment';
 
@@ -14,6 +14,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
+  app.useGlobalPipes(new ValidationPipe());
   // app.use('/assets', express.static(path.join(process.cwd(), 'backend', 'assets')));
 
   const port = environment.DB_CONFIG.PORT;
@@ -37,7 +38,9 @@ async function bootstrap() {
   SwaggerModule.setup(globalPrefix, app, document);
 
   await app.listen(port);
-  Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`);
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
+  );
   Logger.log(`🚀 Application ENV: ${DB_CONFIG.DATABASE_CONFIG.database}`);
 }
 bootstrap();

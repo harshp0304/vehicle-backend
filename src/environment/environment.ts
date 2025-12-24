@@ -16,10 +16,12 @@ interface IDatabaseConfigAttributes {
   urlDatabase?: string;
   logging?: boolean;
   dialectOptions?: {
-    ssl?: {
-      require: boolean;
-      rejectUnauthorized: boolean;
-    } | boolean;
+    ssl?:
+      | {
+          require: boolean;
+          rejectUnauthorized: boolean;
+        }
+      | boolean;
   };
   pool?: {
     max: number;
@@ -53,7 +55,7 @@ const DB_CONFIG: Environment = {
   JWTKEY: '',
   TOKEN_EXPIRATION: '1w',
   SECRET_KEY: '',
-  PORT: 4000,
+  PORT: 3000,
   DATABASE_CONFIG: {
     username: 'postgres',
     password: 'postgres', // Change this to your PostgreSQL password
